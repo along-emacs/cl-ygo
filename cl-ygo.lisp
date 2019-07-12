@@ -37,12 +37,12 @@
 
 ;; for test
 (defun runsql (sql)
-  (dbi:with-connection
+  (with-connection
       (con :sqlite3
 	   :database-name "D:/Programs/YGOPro/cards.cdb" )
-    (let* ((query  (dbi:prepare con sql))
-	   (result (dbi:execute query)))
-      (dbi:fetch-all result))))
+    (let* ((query  (prepare con sql))
+	   (result (execute query)))
+      (fetch-all result))))
 
 ;; pretty print for instance of card
 (defmethod print-object ((cd card) stream)
@@ -82,7 +82,7 @@ where texts.id = " (write-to-string id) ";"))
     	  ((or (eq l 'eof)
 	       (string= l "!side")) "Inited")
 	(let ((id (parse-integer l :junk-allowed t)))
-	  (when (cl-ppcre:scan-to-strings "side" l)
+	  (when (scan-to-strings "side" l)
 	      (setq in-main nil))
 	  (when id
 	    (push (get-card-by-id id)
@@ -99,7 +99,7 @@ where texts.id = " (write-to-string id) ";"))
   (let ((result
 	 (mapcar #'(lambda (zone)
 		     (mapcar #'(lambda (card)
-				 (when (cl-ppcre:scan-to-strings
+				 (when (scan-to-strings
 					name (card-name card))
 				   card))
 			     (getf *card-lists* zone)))
