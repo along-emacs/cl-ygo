@@ -8,6 +8,9 @@
 (defparameter *cards-db* "cards.cdb"
   "sqlite3 database file")
 
+(defparameter *cards-cache* nil
+  "cache of all cards")
+
 ;; '(:deck (card1 card2...)
 ;;   :hand (card3 card4...))
 (defparameter *card-lists* '(:deck ()      :hand () :extra ()
@@ -68,25 +71,54 @@ where texts.id = " (write-to-string id) ";"))
 		   :name (getf card-info :|name|)
 		   :desc (getf card-info :|desc|))))
 
-(defun empty-decks ()
+(defun empty-cache ()
+  (setq *cards-cache* nil))
+
+(defun empty-deck ()
   (loop for (zone list) on *card-lists* by #'cddr do
        (setf (getf *card-lists* zone) nil)))
 
-(defun init-deck (name)
-  (let ((deck-path (get-dir-of *deck-dir* "/" name ".ydk"))
-	(in-main t))
-    (empty-decks)
+;; Format of ydk file:
+;; #created by ...
+;; #main
+;; card id 1
+;; card id 2
+;; #extra
+;; card id 3
+;; card id 4
+;; !side
+;; card id 5
+(defun parse-deck (name)
+  (let ((deck-list nil)
+	(deck-path (get-dir-of *deck-dir* "/" name ".ydk"))
+	(card-id 0) (main-p nil) (extra-p nil) (side-p nil))
     (with-open-file (deck deck-path :direction :input)
-      (do ((l (read-line deck)
-    	      (read-line deck nil 'eof)))
-    	  ((or (eq l 'eof)
-	       (string= l "!side")) "Inited")
-	(let ((id (parse-integer l :junk-allowed t)))
-	  (when (scan-to-strings "side" l)
-	      (setq in-main nil))
-	  (when id
-	    (push (get-card-by-id id)
-		  (getf *card-lists* (if in-main :deck :extra)))))))))
+      (loop for line = (read-line deck nil nil) while line do
+	   (cond ((scan-to-strings "^#main"  line) (setq main-p  t card-id 0))
+		 ((scan-to-strings "^#extra" line) (setq extra-p t card-id 0))
+		 ((scan-to-strings "^!side"  line) (setq side-p  t card-id 0))
+		 ((scan-to-strings "^[0-9]+" line) (setq card-id (parse-integer line
+										:junk-allowed t)))
+		 (t                                (setq card-id 0)))
+	   (when (not (zerop card-id))
+	     (push card-id
+		   (getf deck-list
+			 (cond ((equal `(,main-p ,extra-p ,side-p) '(t  nil nil)) :deck)
+			       ((equal `(,main-p ,extra-p ,side-p) '(t   t  nil)) :extra)
+			       ((equal `(,main-p ,extra-p ,side-p) '(t   t   t )) :side)
+			       (t                                                 :side)))))))
+    deck-list))
+
+(defun init-deck (name)
+  (let ((deck-list (parse-deck name)))
+    (map nil
+	 #'(lambda (deck-name)
+	     (let ((card-id-list (getf deck-list deck-name)))
+	       (loop for card-id in card-id-list do
+		    (let ((card-obj (get-card-by-id card-id)))
+		      (push card-obj *cards-cache*)
+		      (push card-obj (getf *card-lists* deck-name))))))
+	 '(:deck :extra))))
 
 (defun get-cards-from (&rest zones)
   (apply #'append
