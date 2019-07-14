@@ -132,7 +132,7 @@ Default is the main deck."
 			'(:deck)
 			zones))
 	 (cards-list (loop for zone in zone-list collect
-			  (getf *card-lists* zone))))
+			  (list zone (getf *card-lists* zone)))))
     (apply #'append cards-list)))
 
     
