@@ -135,15 +135,15 @@ where texts.id = " (write-to-string id) ";"))
 (defun search-cards-by-name (name &rest zones)
   (apply #'append
 	 (loop for (zone cards) on (apply #'decks zones) by #'cddr collect
-	      `(,zone
-		,(remove-if-not #'(lambda (card)
-				    (scan-to-strings name
-						     (card-name card)))
-				cards)))))
+	      `(,zone ,(remove-if-not #'(lambda (card)
+					  (scan-to-strings name
+							   (card-name card)))
+				      cards)))))
 
 (defun search-cards-by-sequence (number &rest zones)
-  (loop for (zone cards) on (apply #'decks zones) by #'cddr collect
-       `(,zone ,(loop
-		   for card in cards
-		   for ctr from 1 to number collect
-		   card))))
+  (apply #'append
+	 (loop for (zone cards) on (apply #'decks zones) by #'cddr collect
+	      `(,zone ,(loop
+			  for card in cards
+			  for ctr from 1 to number collect
+			  card)))))
