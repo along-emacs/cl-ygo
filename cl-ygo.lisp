@@ -116,28 +116,24 @@ card id 5
   (empty-cache)
   (empty-deck)
   (let ((deck-list (parse-deck name)))
-    (map nil
-	 #'(lambda (deck-name)
-	     (let ((card-id-list (getf deck-list deck-name)))
-	       (loop for card-id in card-id-list do
-		    (let ((card-obj (get-card-by-id card-id)))
-		      (push card-obj *cards-cache*)
-		      (push card-obj (getf *card-lists* deck-name))))))
-	 '(:deck :extra))))
+    (mapcar
+     #'(lambda (deck-name)
+	 (let ((card-id-list (getf deck-list deck-name)))
+	   (loop for card-id in card-id-list do
+		(let ((card-obj (get-card-by-id card-id)))
+		  (push card-obj *cards-cache*)
+		  (push card-obj (getf *card-lists* deck-name))))))
+     '(:deck :extra))))
 
 (defun get-cards-from (&rest zones)
-  "Get cards from specific zones.
-Default is the main deck."
-  (let* ((zone-list (if (null zones)
-			'(:deck)
-			zones))
-	 (cards-list (loop for zone in zone-list collect
-			  (list zone (getf *card-lists* zone)))))
-    (apply #'append cards-list)))
+  "Get cards from specific zones which default is :deck."
+  (let* ((zone-list (if (null zones) '(:deck) zones))
+	 (card-list (loop for zone in zone-list collect
+			 (list zone (getf *card-lists* zone)))))
+    (apply #'append card-list)))
     
 (defun search-cards-by-name (name &rest zones)
-  "Search cards by name.
-Default location is the main deck."
+  "Search cards by name."
   (let* ((card-list (apply #'get-cards-from zones))
 	 (zone-list (remove-if-not #'keywordp card-list)))
     (loop for zone in zone-list collect
