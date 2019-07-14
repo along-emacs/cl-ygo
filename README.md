@@ -60,3 +60,19 @@ Common Lisp 版本的 YGO 。
     (:EXTRA (#<青眼双爆裂龙>  #<青眼精灵龙> ))
 	(:HAND NIL))
    ```
+8. TODO: 使用 `lisp` 风格的，且尽量接近自然语言的方式处理更多的检索条件。\
+   比如要检索 `8星以下的龙族或魔法师族通常怪兽` 的代码如下：
+   ```commonlisp
+   (search-cards (and (or (race = :dragon)
+                          (race = :spellcaster))
+                      (level <= 8)
+                      (type = :normal)))
+   ```
+9. TODO: 实现卡牌从一个区域移动到另一个区域。 \
+   常见的有 `抽卡` 这个操作，比如：
+   ```commomlisp
+   (move-cards '(#<card1> #<card2>) :deck :hand)
+   <==>
+   (draw 2)
+   ```
+10. TODO: 其他。
