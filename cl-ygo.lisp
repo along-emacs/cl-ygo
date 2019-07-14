@@ -138,14 +138,10 @@ Default is the main deck."
     
 (defun search-cards-by-name (name &rest zones)
   "Search card by name. Default location is the main deck."
-  (let* ((zone-list (if (null zones)
-			'(:deck)
-			zones))
+  (let* ((cards (apply #'get-cards-from zones))
 	 (result
-	  (loop for zone in zone-list collect
-	       (remove nil
-		       (loop for card in (getf *card-lists* zone) collect
-			    (when (scan-to-strings
-				   name (card-name card))
-			      card))))))
-    (apply #'append result)))
+	  (loop for card in cards collect
+	       (when (scan-to-strings
+		      name (card-name card))
+		 card))))
+    (remove nil result)))
