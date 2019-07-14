@@ -75,7 +75,6 @@
       (fetch-all result))))
 
 (defmethod print-object ((cd card) stream)
-  "Pretty print for instance of card"
   (format stream "#<~A> "
 	  ;; (card-id cd)
 	  (card-name cd)))
@@ -147,3 +146,15 @@ where texts.id = " (write-to-string id) ";"))
 			  for card in cards
 			  for ctr from 1 to number collect
 			  card)))))
+
+(defun Fisher-Yates-Shuffle (zone)	;(random n) => [0, n)
+  (let* ((len (length (cards zone)))
+	 (new-cards-list
+	  (loop for i from len downto 1 collect
+	       (nth (random (1+ i)) (cards zone)))))
+    (setf (getf *card-lists* zone) new-cards-list)))
+
+(defun move-cards (cards-lists-with-zone dest-zone &optional (shuffle t))
+  (pprint cards-lists-with-zone)
+  (when shuffle
+    (fisher-yates-shuffle dest-zone)))
