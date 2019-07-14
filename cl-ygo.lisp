@@ -34,7 +34,9 @@
    (type        :accessor card-type)
    (description :accessor card-desc
 		:initarg  :desc)
-   (functions   :accessor card-func)))
+   (functions   :accessor card-func)
+   (flags       :accessor card-flags)
+   (effects     :accessor card-effects)))
 
 (defun runsql (sql)
   "For test"
@@ -128,3 +130,4 @@ where texts.id = " (write-to-string id) ";"))
 			    (when (scan-to-strings
 				   name (card-name card))
 			      card)))))))
+
