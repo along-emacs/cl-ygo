@@ -11,10 +11,14 @@
 (defparameter *cards-cache* nil
   "cache of all cards")
 
-(defparameter *card-lists* '(:deck ()      :hand () :extra ()
-			     :monster ()   :spell&trap ()
-			     :graveyard () :banished ()
-			     :field ()     :pendulum ()))
+(defparameter *zones-list* '(:deck      :hand  :extra 
+			     :monster   :spell&trap 
+			     :graveyard :banished 
+			     :field     :pendulum))
+
+(defparameter *card-lists* (apply #' append
+				     (loop for zone in *zones-list* collect
+					  `(,zone nil))))
 
 (defclass player ()
   ((name :accessor player-name
@@ -37,6 +41,29 @@
    (functions   :accessor card-func)
    (flags       :accessor card-flags)
    (effects     :accessor card-effects)))
+
+(defun empty-cache ()
+  (setq *cards-cache* nil))
+
+(defun empty-deck ()
+  (loop for zone in *zones-list* do
+       (setf (getf *card-lists* zone) nil)))
+
+(defun decks (&rest zones)
+  (let* ((zone-list (if (null zones)
+			'(:deck) zones))
+	 (card-list (loop for zone in zone-list collect
+			 (list zone (getf *card-lists* zone))))
+	 (decks (apply #'append card-list)))
+    decks))
+
+(defun cards (&rest zones)
+  (let* ((zone-list (if (null zones)
+			'(:deck) zones))
+	 (deck-list (apply #'decks zone-list))
+	 (card-list (remove-if #'keywordp deck-list))
+	 (cards (apply #'append card-list)))
+    cards))
 
 (defun runsql (sql)
   "For test"
@@ -71,13 +98,6 @@ where texts.id = " (write-to-string id) ";"))
 		   :name (getf card-info :|name|)
 		   :desc (getf card-info :|desc|))))
 
-(defun empty-cache ()
-  (setq *cards-cache* nil))
-
-(defun empty-deck ()
-  (loop for (zone list) on *card-lists* by #'cddr do
-       (setf (getf *card-lists* zone) nil)))
-
 (defun parse-deck (name)
   (let ((deck-list nil)
 	(deck-path (get-dir-of *deck-dir* "/" name ".ydk"))
@@ -99,35 +119,31 @@ where texts.id = " (write-to-string id) ";"))
 			       (t                                                 :side)))))))
     deck-list))
 
+(defun fill-deck (id &optional (zone :deck))
+  (let ((card-obj (get-card-by-id id)))
+    (push card-obj *cards-cache*)
+    (push card-obj (getf *card-lists* zone))))
+
 (defun init-deck (name)
   (empty-cache)
   (empty-deck)
-  (let ((deck-list (parse-deck name)))
-    (mapcar
-     #'(lambda (deck-name)
-	 (let ((card-id-list (getf deck-list deck-name)))
-	   (loop for card-id in card-id-list do
-		(let ((card-obj (get-card-by-id card-id)))
-		  (push card-obj *cards-cache*)
-		  (push card-obj (getf *card-lists* deck-name))))))
-     '(:deck :extra))))
+  (let ((deck-id-list (parse-deck name)))
+    (loop for (zone id-list) on deck-id-list by #'cddr do
+	 (loop for id in id-list do
+	      (fill-deck id zone)))))
 
-(defun get-cards-from (&rest zones)
-  "Get cards from specific zones which default is :deck."
-  (let* ((zone-list (if (null zones) '(:deck) zones))
-	 (card-list (loop for zone in zone-list collect
-			 (list zone (getf *card-lists* zone)))))
-    (apply #'append card-list)))
-    
 (defun search-cards-by-name (name &rest zones)
-  "Search cards by name."
-  (let* ((card-list (apply #'get-cards-from zones))
-	 (zone-list (remove-if-not #'keywordp card-list)))
-    (loop for zone in zone-list collect
-	 (list zone
-	       (remove nil
-		       (loop for card in (getf card-list zone) collect
-			    (when (scan-to-strings
-				   name (card-name card))
-			      card)))))))
+  (apply #'append
+	 (loop for (zone cards) on (apply #'decks zones) by #'cddr collect
+	      `(,zone
+		,(remove-if-not #'(lambda (card)
+				    (scan-to-strings name
+						     (card-name card)))
+				cards)))))
 
+(defun search-cards-by-sequence (number &rest zones)
+  (loop for (zone cards) on (apply #'decks zones) by #'cddr collect
+       `(,zone ,(loop
+		   for card in cards
+		   for ctr from 1 to number collect
+		   card))))
