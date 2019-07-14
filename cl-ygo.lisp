@@ -134,14 +134,16 @@ Default is the main deck."
 	 (cards-list (loop for zone in zone-list collect
 			  (list zone (getf *card-lists* zone)))))
     (apply #'append cards-list)))
-
     
 (defun search-cards-by-name (name &rest zones)
-  "Search card by name. Default location is the main deck."
-  (let* ((cards (apply #'get-cards-from zones))
-	 (result
-	  (loop for card in cards collect
-	       (when (scan-to-strings
-		      name (card-name card))
-		 card))))
-    (remove nil result)))
+  "Search cards by name.
+Default location is the main deck."
+  (let* ((card-list (apply #'get-cards-from zones))
+	 (zone-list (remove-if-not #'keywordp card-list)))
+    (loop for zone in zone-list collect
+	 (list zone
+	       (remove nil
+		       (loop for card in (getf card-list zone) collect
+			    (when (scan-to-strings
+				   name (card-name card))
+			      card)))))))
