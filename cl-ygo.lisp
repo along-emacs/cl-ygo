@@ -11,12 +11,14 @@
 (defparameter *cards-cache* nil
   "cache of all cards")
 
-;; '(:deck (card1 card2...)
-;;   :hand (card3 card4...))
 (defparameter *card-lists* '(:deck ()      :hand () :extra ()
 			     :monster ()   :spell&trap ()
 			     :graveyard () :banished ()
-			     :field ()     :pendulum ()))
+			     :field ()     :pendulum ())
+  "Structure:
+'(:deck (card1 card2...)
+  :hand (card3 card4...))
+")
 
 (defclass player ()
   ((name :accessor player-name
@@ -38,8 +40,8 @@
 		:initarg  :desc)
    (functions   :accessor card-func)))
 
-;; for test
 (defun runsql (sql)
+  "For test"
   (with-connection
       (con :sqlite3
 	   :database-name "D:/Programs/YGOPro/cards.cdb" )
@@ -47,8 +49,8 @@
 	   (result (execute query)))
       (fetch-all result))))
 
-;; pretty print for instance of card
 (defmethod print-object ((cd card) stream)
+  "Pretty print for instance of card"
   (format stream "#<~A> "
 	  ;; (card-id cd)
 	  (card-name cd)))
@@ -129,13 +131,18 @@ card id 5
 		  zone))))
     
 (defun search-cards-by-name (name &rest zones)
-  (let ((result
-	 (mapcar #'(lambda (zone)
-		     (mapcar #'(lambda (card)
-				 (when (scan-to-strings
-					name (card-name card))
-				   card))
-			     (getf *card-lists* zone)))
-		 zones)))
+  (let* ((zone-list (if (null zones)
+			(remove-if #'(lambda (x)
+				       (not (keywordp x)))
+				   *card-lists*)
+			zones))
+	 (result
+	  (mapcar #'(lambda (zone)
+		      (mapcar #'(lambda (card)
+				  (when (scan-to-strings
+					 name (card-name card))
+				    card))
+			      (getf *card-lists* zone)))
+		  zone-list)))
     (remove nil (car result))))
 
