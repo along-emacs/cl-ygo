@@ -99,6 +99,8 @@ Common Lisp 版本的 YGO 。 \
 
 ### 函数
 #### empty-cache ()
+将 `*cards-cache*` 指向 `nil` ，这将减少卡牌对象的一次引用。
+
 #### empty-deck ()
 #### decks (&rest zones)
 #### cards (&rest zones)
