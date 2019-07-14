@@ -1,6 +1,9 @@
 # cl-ygo
 Common Lisp 版本的 YGO 。
 
+## 组织
+目录结构与项目：[ygopro](https://github.com/Fluorohydride/ygopro) 一致，因为需要引用其 `cards.cdb` 与卡牌的图片。
+
 ## 功能
 1. 定义了全局的卡牌缓存`*cards-cache*`。\
    初始化卡组时，这里会存放每个对象的引用。
@@ -12,8 +15,8 @@ Common Lisp 版本的 YGO 。
      :graveyard () :banished ()
      :field ()     :pendulum ())
    ```
-3. 解析 ydk 文件: `(parse-deck "deck name")` 。 \
-   例：假设一个 ydk 文件的内容如下：
+3. 解析 `ydk` 文件: `(parse-deck "deck name")` 。 \
+   例：假设一个 `example.ydk` 的内容如下：
    ```text
    #created by ...
    #main
@@ -25,16 +28,35 @@ Common Lisp 版本的 YGO 。
    !side
    card id 5
    ```
-   经过解析将会返回如下的 lisp 属性表：
+   经过解析将会返回如下的 `lisp` 属性表：
    ```commonlisp
+   (parse-deck "example") =>
    '(:deck (card id 1 card id 2 )
      :extra (card id 3 card id 4) :side (card id 5))
    ```
-4. 利用 ydk 文件的内容初始化牌组： `(init-deck "deck name")` 。 \
-   如上的例子将会返回如下的 lisp 属性表：
+4. 利用 `ydk` 文件的内容初始化牌组： `(init-deck "deck name")` 。 \
+   如上的例子将会返回如下的 `lisp` 属性表：
    ```commonlisp
-   '(:deck (#<card 1> #<card 2>)
-     :extra (#<card 3> #<card 4>))
+   (init-deck "example") =>
+   '(:DECK (#<card 1> #<card 2>)
+     :EXTRA (#<card 3> #<card 4>))
    ```
 5. 根据卡片编号获取卡片信息并返回一个初始化后的对象实例：`(get-card-by-id id)`。 \
-   
+   - [ ] 更新 `sql` 以获得更多信息
+6. 根据参数获取指定区域的所有卡牌：`(get-cards-from [[:deck]|:hand :graveyard ...])`。 \
+   可以加多个关键词参数，默认的区域参数是 `:deck` 。因为需要得知卡牌的来源，所以最后返回的结果将是 `lisp` 属性表：
+   ```commonlisp
+   (get-cards-from :deck :extra) =>
+   '(:DECK (card id 1 card id 2 )
+     :EXTRA (card id 3 card id 4))
+   ```
+7. 在指定的位置根据名字检索卡牌：`(search-cards-by-name "card name" [[:deck]|:hand :extra ...])`。 \
+   同样可以加多个指定区域的参数。如果不存在则返回 `nil`：
+   ```commonlisp
+   (search-cards-by-name "青眼" :deck :extra :hand) =>
+   ((:DECK
+    (#<青眼白龙>  #<青眼白龙>  #<青眼白龙>  #<青眼亚白龙>  #<青眼亚白龙>  #<青眼亚白龙>  #<青眼混沌极龙>
+     #<青眼混沌极龙>  #<青眼混沌龙> ))
+    (:EXTRA (#<青眼双爆裂龙>  #<青眼精灵龙> ))
+	(:HAND NIL))
+   ```
