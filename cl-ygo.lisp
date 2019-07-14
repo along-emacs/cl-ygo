@@ -134,17 +134,14 @@ card id 5
     
 (defun search-cards-by-name (name &rest zones)
   (let* ((zone-list (if (null zones)
-			(remove-if #'(lambda (x)
-				       (not (keywordp x)))
-				   *card-lists*)
+			(remove-if-not #'keywordp
+				       *card-lists*)
 			zones))
 	 (result
-	  (mapcar #'(lambda (zone)
-		      (mapcar #'(lambda (card)
-				  (when (scan-to-strings
-					 name (card-name card))
-				    card))
-			      (getf *card-lists* zone)))
-		  zone-list)))
-    (remove nil (car result))))
-
+	  (loop for zone in zone-list collect
+	       (remove nil
+		       (loop for card in (getf *card-lists* zone) collect
+			    (when (scan-to-strings
+				   name (card-name card))
+			      card))))))
+    (apply #'append result)))
