@@ -42,6 +42,7 @@ Common Lisp 版本的 YGO 。
      :EXTRA (#<card 3> #<card 4>))
    ```
 5. 根据卡片编号获取卡片信息并返回一个初始化后的对象实例：`(get-card-by-id id)`。
+   - [x] 获取基本信息
    - [ ] 更新 `sql` 以获得更多信息
 6. 根据参数获取指定区域的所有卡牌：`(get-cards-from [[:deck]|:hand :graveyard ...])`。 \
    可以加多个关键词参数，默认的区域参数是 `:deck` 。因为需要得知卡牌的来源，所以最后返回的结果将是 `lisp` 属性表：
