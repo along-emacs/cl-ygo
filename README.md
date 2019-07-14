@@ -82,19 +82,19 @@ Common Lisp 版本的 YGO 。 \
 
 ## 代码说明
 ### 变量
-#### *deck-dir*
+#### \*deck-dir\*
 存放卡组 `ydk` 文件的目录名。
 
-#### *cards-db*
+#### \*cards-db\*
 定义卡牌信息数据库的文件名。目前暂时设置的和 `ygopro` 一样。
 
-#### *cards-cache*
+#### \*cards-cache\*
 为在初始化卡组时所有创建的 `card` 对象的实例添加一次引用。
 
-#### *zones-list*
+#### \*zones-list\*
 定义了所有区域的列表，每个区域名字用关键字表示。
 
-#### *card-lists*
+#### \*card-lists\*
 根据区域列表生产空的列表，用来存放 `card` 对象实例。
 
 ### 函数
