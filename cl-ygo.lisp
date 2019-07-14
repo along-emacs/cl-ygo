@@ -14,11 +14,7 @@
 (defparameter *card-lists* '(:deck ()      :hand () :extra ()
 			     :monster ()   :spell&trap ()
 			     :graveyard () :banished ()
-			     :field ()     :pendulum ())
-  "Structure:
-'(:deck (card1 card2...)
-  :hand (card3 card4...))
-")
+			     :field ()     :pendulum ()))
 
 (defclass player ()
   ((name :accessor player-name
@@ -81,17 +77,6 @@ where texts.id = " (write-to-string id) ";"))
        (setf (getf *card-lists* zone) nil)))
 
 (defun parse-deck (name)
-"Format of ydk file:
-#created by ...
-#main
-card id 1
-card id 2
-#extra
-card id 3
-card id 4
-!side
-card id 5
-"
   (let ((deck-list nil)
 	(deck-path (get-dir-of *deck-dir* "/" name ".ydk"))
 	(card-id 0) (main-p nil) (extra-p nil) (side-p nil))
