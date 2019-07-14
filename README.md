@@ -2,7 +2,7 @@
 Common Lisp version of YGO engine
 
 ## Features:
-1. parse ydk file: `(parse-deck "deck name")`
+1. parse ydk file: `(parse-deck "deck name")` \
    For example, format of ydk file:
    ```text
    #created by ...
