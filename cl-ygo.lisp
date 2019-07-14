@@ -126,11 +126,15 @@ card id 5
 	 '(:deck :extra))))
 
 (defun get-cards-from (&rest zones)
-  (apply #'append
-	 (loop for zone in zones collect
-	      (if (keywordp zone)
-		  (getf *card-lists* zone)
-		  zone))))
+  "Get cards from specific zones.
+Default is the main deck."
+  (let* ((zone-list (if (null zones)
+			'(:deck)
+			zones))
+	 (cards-list (loop for zone in zone-list collect
+			  (getf *card-lists* zone))))
+    (apply #'append cards-list)))
+
     
 (defun search-cards-by-name (name &rest zones)
   "Search card by name. Default location is the main deck."
