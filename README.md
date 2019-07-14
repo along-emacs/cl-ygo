@@ -72,7 +72,7 @@ Common Lisp 版本的 YGO 。
 9. TODO: 实现卡牌从一个区域移动到另一个区域。 \
    常见的有 `抽卡` 这个操作，比如：
    ```commomlisp
-   (move-cards '(#<card1> #<card2>) :deck :hand)
+   (move-cards :deck :hand '(#<card1> #<card2>))
    <==>
    (draw 2)
    ```
