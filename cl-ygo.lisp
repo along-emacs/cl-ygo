@@ -113,6 +113,8 @@ card id 5
     deck-list))
 
 (defun init-deck (name)
+  (empty-cache)
+  (empty-deck)
   (let ((deck-list (parse-deck name)))
     (map nil
 	 #'(lambda (deck-name)
