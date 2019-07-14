@@ -133,9 +133,9 @@ card id 5
 		  zone))))
     
 (defun search-cards-by-name (name &rest zones)
+  "Search card by name. Default location is the main deck."
   (let* ((zone-list (if (null zones)
-			(remove-if-not #'keywordp
-				       *card-lists*)
+			'(:deck)
 			zones))
 	 (result
 	  (loop for zone in zone-list collect
