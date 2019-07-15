@@ -11,13 +11,13 @@
 (defparameter *cards-index* nil
   "Index of all cards")
 
-(defparameter *zones-list* '(:deck      :hand  :extra 
-			     :monster   :spell&trap 
-			     :graveyard :banished 
-			     :field     :pendulum))
+(defparameter *zone-list* '(:deck      :hand  :extra 
+			    :monster   :spell&trap 
+			    :graveyard :banished 
+			    :field     :pendulum))
 
 (defparameter *card-lists* (apply #' append
-				     (loop for zone in *zones-list* collect
+				     (loop for zone in *zone-list* collect
 					  `(,zone nil))))
 
 (defclass player ()
@@ -46,7 +46,7 @@
   (setq *cards-index* nil))
 
 (defun empty-deck ()
-  (loop for zone in *zones-list* do
+  (loop for zone in *zone-list* do
        (setf (getf *card-lists* zone) nil)))
 
 (defun decks (&rest zones)
