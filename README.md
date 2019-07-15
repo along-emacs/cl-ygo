@@ -20,7 +20,7 @@ Common Lisp 版本的 YGO 。 \
 3. TODO: 实现卡牌从一个区域移动到另一个区域。 \
    常见的有 `抽卡` 这个操作，比如：
    ```commomlisp
-   (move-cards :deck :hand '(#<card1> #<card2>))
+   (move-cards :main :hand '(#<card1> #<card2>))
    <==>
    (draw 2)
    ```
@@ -34,7 +34,7 @@ Common Lisp 版本的 YGO 。 \
    ```commomlisp
    card        => #<card>
    card-list   => '(#<card1> #card<2>)
-   card-lists  => '(:deck (#<card1> #card<2>) :hand (#<card3> #card<4>))
+   card-lists  => '(:main (#<card1> #card<2>) :hand (#<card3> #card<4>))
    ```
 3. 全局变量两边加 `*`
 4. 变量名与变量名之间使用 `-` 连接
@@ -62,7 +62,7 @@ Common Lisp 版本的 YGO 。 \
 遍历 `*card-lists` ，将每一项指向 `nil` 。
 
 #### decks (&rest zones)
-可传入 0-n 个参数，默认为 `deck` 。
+可传入 0-n 个参数，默认为 `main` 。
 返回的结果会带上区域名：
 ```commomlisp
 (decks :side :hand) =>
@@ -71,7 +71,7 @@ Common Lisp 版本的 YGO 。 \
 ```
 
 #### cards (&rest zones)
-可传入 0-n 个参数，默认为 `deck` 。
+可传入 0-n 个参数，默认为 `main` 。
 返回的结构不会带上区域名：
 ```commomlisp
 (cards :side :hand) =>
@@ -105,11 +105,11 @@ card-id-5
 将返回如下列表：
 ```commonlisp
 (parse-deck "example") =>
-'(:deck (card-id-1 card-id-2 )
+'(:main (card-id-1 card-id-2 )
  :extra (card-id-3 card-id-4) :side (card-id-5))
 ```
 
-#### fill-deck (id &optional (zone :deck))
+#### fill-deck (id &optional (zone :main))
 根据卡牌 `id` 创建对象实例，并加入到指定的区域列表中。
 
 #### init-deck (name)
@@ -121,7 +121,7 @@ card-id-5
 将会返回区域名：
 ```commonlisp
 (search-cards-by-name "混沌") =>
-'(:DECK (#<青眼混沌极龙>  #<青眼混沌极龙>  #<青眼混沌龙>  #<混沌形态>  #<混沌形态> ))
+'(:MAIN (#<青眼混沌极龙>  #<青眼混沌极龙>  #<青眼混沌龙>  #<混沌形态>  #<混沌形态> ))
 
 (search-cards-by-name "No" :extra :hand) =>
 '(:EXTRA
@@ -133,8 +133,8 @@ card-id-5
 #### search-cards-by-sequence (number &rest zones)
 返回指定区域的前几张卡牌。可传入多个区域：
 ```commonlisp
-(search-cards-by-sequence 2 :extra :deck) =>
-'(:EXTRA (#<青眼双爆裂龙>  #<始祖龙 古龙> ) :DECK (#<青眼白龙>  #<青眼白龙> ))
+(search-cards-by-sequence 2 :extra :MAIN) =>
+'(:EXTRA (#<青眼双爆裂龙>  #<始祖龙 古龙> ) :MAIN (#<青眼白龙>  #<青眼白龙> ))
 
 (search-cards-by-sequence 2 :hand :side) =>
 '(:HAND NIL :SIDE (#<No.98 绝望皇 霍普勒斯>  #<刺刀枪管龙> ))

@@ -11,7 +11,7 @@
 (defparameter *cards-index* nil
   "Index of all cards")
 
-(defparameter *zone-list* '(:deck      :hand  :extra 
+(defparameter *zone-list* '(:main      :hand  :extra 
 			    :monster   :spell&trap 
 			    :graveyard :banished 
 			    :field     :pendulum))
@@ -51,7 +51,7 @@
 
 (defun decks (&rest zones)
   (let* ((zone-list (if (null zones)
-			'(:deck) zones))
+			'(:main) zones))
 	 (card-list (loop for zone in zone-list collect
 			 `(,zone ,(getf *card-lists* zone))))
 	 (decks (apply #'append card-list)))
@@ -59,7 +59,7 @@
 
 (defun cards (&rest zones)
   (let* ((zone-list (if (null zones)
-			'(:deck) zones))
+			'(:main) zones))
 	 (deck-list (apply #'decks zone-list))
 	 (card-list (remove-if #'keywordp deck-list))
 	 (cards (apply #'append card-list)))
@@ -115,7 +115,7 @@ where texts.id = " (write-to-string id) ";"))
 	   (deck-list (read-from-string deck-string nil t)))
       (remove nil deck-list))))
 
-(defun fill-deck (id &optional (zone :deck))
+(defun fill-deck (id &optional (zone :main))
   (let ((card-obj (get-card-by-id id)))
     (push card-obj *cards-index*)
     (push card-obj (getf *card-lists* zone))))
