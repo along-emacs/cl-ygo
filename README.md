@@ -139,3 +139,7 @@ card-id-5
 (search-cards-by-sequence 2 :hand :side) =>
 '(:HAND NIL :SIDE (#<No.98 绝望皇 霍普勒斯>  #<刺刀枪管龙> ))
 ```
+
+#### Fisher-Yates-Shuffle (zone)
+对指定区域的卡片进行洗牌。使用了如函数名所示的算法。
+由于 `lisp` 对象基本都是引用，所以不会占用太大的空间。
