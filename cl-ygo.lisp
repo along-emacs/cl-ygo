@@ -99,13 +99,16 @@ where texts.id = " (write-to-string id) ";"))
 
 (defun parse-deck (name)
   (with-open-file (deck (get-dir-of *deck-dir* "/" name ".ydk"))      
-    (let* ((raw-string (loop for line = (read-line deck nil nil) while line collect
-			    (cond ((scan-to-strings "created by" line) "((")
-				  ((or (eq (char line 0) #\#)
-				       (eq (char line 0) #\!))
-				   (setf (char line 0) #\:)
-				   (concatenate 'string ")" line "("))
-				  (t line))))
+    (let* ((raw-string (loop
+			  for   ctr  from 1
+			  for   line   =  (read-line deck nil nil)
+			  while line
+			  collect (cond ((= ctr 1) "((")
+					((or (eq (char line 0) #\#)
+					     (eq (char line 0) #\!))
+					 (setf (char line 0) #\:)
+					 (concatenate 'string ")" line "("))
+					(t line))))
 	   (deck-string (regex-replace-all
 			 "" (apply #'concatenate 'string
 				     (append raw-string '("))")))" "))
@@ -120,8 +123,8 @@ where texts.id = " (write-to-string id) ";"))
 (defun init-deck (name)
   (empty-index)
   (empty-deck)
-  (let ((deck-id-list (parse-deck name)))
-    (loop for (zone id-list) on deck-id-list by #'cddr do
+  (let ((deck-id-lists (parse-deck name)))
+    (loop for (zone id-list) on deck-id-lists by #'cddr do
 	 (loop for id in id-list do
 	      (fill-deck id zone)))))
 
