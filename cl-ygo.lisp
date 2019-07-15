@@ -98,25 +98,19 @@ where texts.id = " (write-to-string id) ";"))
 		   :desc (getf card-info :|desc|))))
 
 (defun parse-deck (name)
-  (let ((deck-list nil)
-	(deck-path (get-dir-of *deck-dir* "/" name ".ydk"))
-	(card-id 0) (main-p nil) (extra-p nil) (side-p nil))
-    (with-open-file (deck deck-path :direction :input)
-      (loop for line = (read-line deck nil nil) while line do
-	   (cond ((scan-to-strings "^#main"  line) (setq main-p  t card-id 0))
-		 ((scan-to-strings "^#extra" line) (setq extra-p t card-id 0))
-		 ((scan-to-strings "^!side"  line) (setq side-p  t card-id 0))
-		 ((scan-to-strings "^[0-9]+" line) (setq card-id (parse-integer line
-										:junk-allowed t)))
-		 (t                                (setq card-id 0)))
-	   (when (not (zerop card-id))
-	     (push card-id
-		   (getf deck-list
-			 (cond ((equal `(,main-p ,extra-p ,side-p) '(t  nil nil)) :deck)
-			       ((equal `(,main-p ,extra-p ,side-p) '(t   t  nil)) :extra)
-			       ((equal `(,main-p ,extra-p ,side-p) '(t   t   t )) :side)
-			       (t                                                 :side)))))))
-    deck-list))
+  (with-open-file (deck (get-dir-of *deck-dir* "/" name ".ydk"))      
+    (let* ((raw-string (loop for line = (read-line deck nil nil) while line collect
+			    (cond ((scan-to-strings "created by" line) "((")
+				  ((or (eq (char line 0) #\#)
+				       (eq (char line 0) #\!))
+				   (setf (char line 0) #\:)
+				   (concatenate 'string ")" line "("))
+				  (t line))))
+	   (deck-string (regex-replace-all
+			 "" (apply #'concatenate 'string
+				     (append raw-string '("))")))" "))
+	   (deck-list (read-from-string deck-string nil t)))
+      (remove nil deck-list))))
 
 (defun fill-deck (id &optional (zone :deck))
   (let ((card-obj (get-card-by-id id)))
@@ -158,3 +152,4 @@ where texts.id = " (write-to-string id) ";"))
   (pprint cards-lists-with-zone)
   (when shuffle
     (fisher-yates-shuffle dest-zone)))
+
