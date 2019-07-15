@@ -151,8 +151,14 @@ where texts.id = " (write-to-string id) ";"))
 	       (nth (random (1+ i)) (cards zone)))))
     (setf (getf *card-lists* zone) new-cards-list)))
 
-(defun move-cards (cards-lists-with-zone dest-zone &optional (shuffle t))
+(defun move-cards (cards-lists-with-zone dest-zone)
   (pprint cards-lists-with-zone)
-  (when shuffle
-    (fisher-yates-shuffle dest-zone)))
+  (loop for (zone card-list) on cards-lists-with-zone by #'cddr do
+       (loop for card in card-list do
+	    (push card (getf *card-lists* dest-zone))
+	    (setf (getf *card-lists* zone)
+		  (remove card (getf *card-lists* zone))))))
 
+(defun draw (&optional (number 1))
+  (move-cards
+   (search-cards-by-sequence number :main) :hand))
