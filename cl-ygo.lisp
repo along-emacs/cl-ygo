@@ -53,7 +53,7 @@
   (let* ((zone-list (if (null zones)
 			'(:deck) zones))
 	 (card-list (loop for zone in zone-list collect
-			 (list zone (getf *card-lists* zone))))
+			 `(,zone ,(getf *card-lists* zone))))
 	 (decks (apply #'append card-list)))
     decks))
 
