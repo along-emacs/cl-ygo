@@ -8,8 +8,8 @@
 (defparameter *cards-db* "cards.cdb"
   "sqlite3 database file")
 
-(defparameter *cards-cache* nil
-  "cache of all cards")
+(defparameter *cards-index* nil
+  "Index of all cards")
 
 (defparameter *zones-list* '(:deck      :hand  :extra 
 			     :monster   :spell&trap 
@@ -42,8 +42,8 @@
    (flags       :accessor card-flags)
    (effects     :accessor card-effects)))
 
-(defun empty-cache ()
-  (setq *cards-cache* nil))
+(defun empty-index ()
+  (setq *cards-index* nil))
 
 (defun empty-deck ()
   (loop for zone in *zones-list* do
@@ -120,11 +120,11 @@ where texts.id = " (write-to-string id) ";"))
 
 (defun fill-deck (id &optional (zone :deck))
   (let ((card-obj (get-card-by-id id)))
-    (push card-obj *cards-cache*)
+    (push card-obj *cards-index*)
     (push card-obj (getf *card-lists* zone))))
 
 (defun init-deck (name)
-  (empty-cache)
+  (empty-index)
   (empty-deck)
   (let ((deck-id-list (parse-deck name)))
     (loop for (zone id-list) on deck-id-list by #'cddr do

@@ -33,7 +33,7 @@ Common Lisp 版本的 YGO 。 \
 #### \*cards-db\*
 定义卡牌信息数据库的文件名。目前暂时设置的和 `ygopro` 一样。
 
-#### \*cards-cache\*
+#### \*cards-index\*
 为在初始化卡组时所有创建的 `card` 对象的实例添加一次引用。
 
 #### \*zones-list\*
@@ -43,8 +43,8 @@ Common Lisp 版本的 YGO 。 \
 根据区域列表生产空的列表，用来存放 `card` 对象实例。
 
 ### 函数
-#### empty-cache ()
-将 `*cards-cache*` 指向 `nil` ，这将减少卡牌对象的一次引用。
+#### empty-index ()
+将 `*cards-index*` 指向 `nil` ，这将减少卡牌对象的一次引用。
 
 #### empty-deck ()
 遍历 `*card-lists` ，将每一项指向 `nil` 。
@@ -102,7 +102,7 @@ card-id-5
 
 #### init-deck (name)
 通过传入的 `ydk` 文件名初始化卡组。
-会将原有的 `*cards-cache*` 和 `*card-lists*` 清空。
+会将原有的 `*cards-index*` 和 `*card-lists*` 清空。
 
 #### search-cards-by-name (name &rest zones)
 通过卡牌名，在指定的区域中查找。可传入多个区域。
