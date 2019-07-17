@@ -42,6 +42,10 @@
    (flags       :accessor card-flags)
    (effects     :accessor card-effects)))
 
+(defclass deck ()
+  ((name  :accessor deck-name)
+   (cards :accessor deck-cards)))
+
 (defun empty-index ()
   (setq *cards-index* nil))
 
