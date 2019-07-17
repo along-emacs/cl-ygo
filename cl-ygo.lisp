@@ -145,11 +145,13 @@ where texts.id = " (write-to-string id) ";"))
 			  card)))))
 
 (defun Fisher-Yates-Shuffle (zone)	;(random n) => [0, n)
-  (let* ((len (length (cards zone)))
-	 (new-cards-list
+  (let ((len (length (cards zone)))
+	(src (cards zone)))
+    (setf (getf *card-lists* zone)
 	  (loop for i from len downto 1 collect
-	       (nth (random (1+ i)) (cards zone)))))
-    (setf (getf *card-lists* zone) new-cards-list)))
+	       (let ((card (nth (random i) src)))
+		 (setq src (remove card src))
+		 card)))))
 
 (defun move-cards (cards-lists-with-zone dest-zone)
   (pprint cards-lists-with-zone)
