@@ -2,24 +2,6 @@
 
 (in-package #:cl-ygo)
 
-(defparameter *deck-dir* "deck"
-  "directory of your deck.")
-
-(defparameter *cards-db* "cards.cdb"
-  "sqlite3 database file")
-
-(defparameter *cards-index* nil
-  "Index of all cards")
-
-(defparameter *zone-list* '(:main      :hand  :extra 
-			    :monster   :spell&trap 
-			    :graveyard :banished 
-			    :field     :pendulum))
-
-(defparameter *card-lists* (apply #'append
-				  (loop for zone in *zone-list* collect
-				       `(,zone nil))))
-
 (defclass player ()
   ((name :accessor player-name
 	 :initarg :name)
@@ -45,6 +27,24 @@
 (defclass deck ()
   ((name  :accessor deck-name)
    (cards :accessor deck-cards)))
+
+(defparameter *deck-dir* "deck"
+  "directory of your deck.")
+
+(defparameter *cards-db* "cards.cdb"
+  "sqlite3 database file")
+
+(defparameter *cards-index* nil
+  "Index of all cards")
+
+(defparameter *zone-list* '(:main      :hand  :extra 
+			    :monster   :spell&trap 
+			    :graveyard :banished 
+			    :field     :pendulum))
+
+(defparameter *card-lists* (apply #'append
+				  (loop for zone in *zone-list* collect
+				       `(,zone nil))))
 
 (defvar *deck-table* (let ((table (make-hash-table)))
 		       (loop for deck-name in *zone-list* do
