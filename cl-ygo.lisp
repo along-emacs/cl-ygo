@@ -16,9 +16,9 @@
 			    :graveyard :banished 
 			    :field     :pendulum))
 
-(defparameter *card-lists* (apply #' append
-				     (loop for zone in *zone-list* collect
-					  `(,zone nil))))
+(defparameter *card-lists* (apply #'append
+				  (loop for zone in *zone-list* collect
+				       `(,zone nil))))
 
 (defclass player ()
   ((name :accessor player-name
@@ -45,6 +45,11 @@
 (defclass deck ()
   ((name  :accessor deck-name)
    (cards :accessor deck-cards)))
+
+(defvar *deck-table* (let ((table (make-hash-table)))
+		       (loop for deck-name in *zone-list* do
+			    (setf (gethash deck-name table) (make-instance 'deck)))
+		       table))
 
 (defun empty-index ()
   (setq *cards-index* nil))
